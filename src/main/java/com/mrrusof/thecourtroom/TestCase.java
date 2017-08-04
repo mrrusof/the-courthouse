@@ -17,13 +17,13 @@ public class TestCase {
 
     @Id @GeneratedValue
     private Long id;
-    private Long problemId;
+    private String problemId;
     private String input;
     private String output;
 
     public TestCase(){}
 
-    public TestCase(Long problemId, String input, String output) {
+    public TestCase(String problemId, String input, String output) {
         super();
         this.problemId = problemId;
         this.input = input;
@@ -38,11 +38,11 @@ public class TestCase {
         this.id = id;
     }
 
-    public Long getProblemId() {
+    public String getProblemId() {
         return problemId;
     }
 
-    public void setProblemId(Long problemId) {
+    public void setProblemId(String problemId) {
         this.problemId = problemId;
     }
 
@@ -73,5 +73,5 @@ public class TestCase {
 
 @Lazy
 interface TestCases extends JpaRepository <TestCase,Long>{
-    List<TestCase> findByProblemId(@Param("problem_id") Long problemId);
+    List<TestCase> findByProblemId(@Param("problem_id") String problemId);
 }

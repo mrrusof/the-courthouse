@@ -1,26 +1,26 @@
 package com.mrrusof.thecourtroom;
 
-public class Verdict {
+public class Ruling {
 
     public static final String ACCEPTED = "ACCEPTED";
     public static final String WRONG_ANSWER = "WRONG_ANSWER";
     public static final String TIMEOUT = "TIMEOUT";
     public static final String RUNTIME_ERROR = "RUNTIME_ERROR";
 
-    private final String verdict;
+    private final String ruling;
     private final Long centiseconds;
 
-    public Verdict(String verdict, Long centiseconds) {
-        this.verdict = verdict;
+    public Ruling(String ruling, Long centiseconds) {
+        this.ruling = ruling;
         this.centiseconds = centiseconds;
     }
 
-    public Verdict(String verdict, String time) {
-        this(verdict, timeStringToCentiseconds(time));
+    public Ruling(String ruling, String time) {
+        this(ruling, timeStringToCentiseconds(time));
     }
 
-    public String getVerdict() {
-        return verdict;
+    public String getRuling() {
+        return ruling;
     }
 
     public String getSeconds() {

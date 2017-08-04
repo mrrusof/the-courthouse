@@ -19,15 +19,15 @@ public class Courtroom {
         this.env = env;
     }
 
-    public Verdict trial(Long problemId, String src, String lang) throws Exception {
+    public Ruling trial(String problemId, String src, String lang) throws Exception {
         Long totalCentis = 0l;
         Judge j = getJudge(lang);
         for(TestCase tc : getTestCases(problemId)) {
-            Verdict v = j.rule(src, tc);
-            if(! v.getVerdict().equals(Verdict.ACCEPTED)) return v;
+            Ruling v = j.rule(src, tc);
+            if(! v.getRuling().equals(Ruling.ACCEPTED)) return v;
             totalCentis += v.getCentiseconds();
         }
-        return new Verdict(Verdict.ACCEPTED, totalCentis);
+        return new Ruling(Ruling.ACCEPTED, totalCentis);
     }
 
     private Judge getJudge(String lang) throws Exception {
@@ -39,9 +39,9 @@ public class Courtroom {
         throw new Exception("There is no Judge for language '" + lang + "'.");
     }
 
-    private List<TestCase> getTestCases(Long problemId) throws Exception {
+    private List<TestCase> getTestCases(String problemId) throws Exception {
         List<TestCase> tcs = testCases.findByProblemId(problemId);
         if(tcs.size() > 0) return tcs;
-        throw new Exception("There is no problem with id '" + problemId + "'.");
+        throw new Exception("There are no test cases for problem id '" + problemId + "'.");
     }
 }

@@ -25,7 +25,7 @@ public class Judge {
         this.srcFilename = srcFilename;
     }
 
-    public Verdict rule(String src, TestCase tc) throws IOException, InterruptedException {
+    public Ruling rule(String src, TestCase tc) throws IOException, InterruptedException {
 
         log.info(tc.toString());
 
@@ -33,11 +33,11 @@ public class Judge {
 
         String output = execJudge();
 
-        log.info("Verdict " + output.trim());
+        log.info("Ruling " + output.trim());
 
         JSONObject json = new JSONObject(output);
 
-        return buildVerdict(json);
+        return buildRuling(json);
     }
 
     private void setupWorkdir(String src, TestCase tc) throws IOException {
@@ -70,7 +70,7 @@ public class Judge {
         return output;
     }
 
-    public Verdict buildVerdict(JSONObject json) {
-        return new Verdict(json.getString("verdict"), json.getString("time"));
+    public Ruling buildRuling(JSONObject json) {
+        return new Ruling(json.getString("ruling"), json.getString("time"));
     }
 }
