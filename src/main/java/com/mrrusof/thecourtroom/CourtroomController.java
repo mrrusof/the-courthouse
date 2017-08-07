@@ -24,7 +24,7 @@ public class CourtroomController {
         this.env = env;
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin(origins = "*")
     @RequestMapping(value="/judges", method=RequestMethod.GET)
     public List<JudgeId> judges() {
         List<String> judgeIds = Arrays.asList(env.getProperty("judges").split(","));
@@ -37,7 +37,7 @@ public class CourtroomController {
         return judges;
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin(origins = "*")
     @RequestMapping(value="/judges/{id}", method=RequestMethod.GET)
     public JudgeId judge(@PathVariable(value="id") String id) throws Exception {
         if(Arrays.asList(env.getProperty("judges").split(",")).indexOf(id) == -1)
@@ -47,7 +47,7 @@ public class CourtroomController {
         return new JudgeId(id, name, codemirrormode);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin(origins = "*")
     @RequestMapping(value="/judges/{language}/trial", method=RequestMethod.POST)
     public Ruling trial(@PathVariable(value="language") String language,
                         @RequestBody TrialParams params)
