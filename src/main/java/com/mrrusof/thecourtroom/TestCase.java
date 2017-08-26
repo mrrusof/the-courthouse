@@ -65,7 +65,7 @@ public class TestCase {
     @Override
     public String toString() {
         return "TestCase { \"id\":" + id +
-            ", \"problem_id\":" + problemId +
+            ", \"problem_id\":" + JSONObject.quote(problemId) +
             ", \"input\":" + JSONObject.quote(input) +
             ", \"output\":" + JSONObject.quote(output) + " }";
     }
