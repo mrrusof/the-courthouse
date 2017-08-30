@@ -32,9 +32,8 @@ public class Courtroom {
 
     private Judge getJudge(String lang) throws Exception {
         String judgecmd = "judge." + lang + ".judgecmd";
-        String mainfile = "judge." + lang + ".mainfile";
-        if(env.containsProperty(judgecmd) && env.containsProperty(mainfile)) {
-            return new Judge(env.getProperty(judgecmd), env.getProperty(mainfile));
+        if(env.containsProperty(judgecmd)) {
+            return new Judge(env.getProperty(judgecmd));
         }
         throw new Exception("There is no Judge for language '" + lang + "'.");
     }

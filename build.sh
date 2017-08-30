@@ -1,4 +1,3 @@
 #!/bin/bash
 
-./mvnw package
-docker build -t the-courtroom .
+./mvnw package && docker build -t the-courtroom .

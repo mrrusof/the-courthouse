@@ -1,6 +1,7 @@
 package com.mrrusof.thecourtroom;
 
 import java.io.File;
+import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,25 +14,22 @@ import org.slf4j.LoggerFactory;
 
 public class Judge {
 
-    private final String WORKDIR = "/tmp/judge";
-    private final File workdir = new File(WORKDIR);
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     private final String judgeCmd;
-    private final String srcFilename;
 
-    public Judge(String judgeCmd, String srcFilename) {
+    public Judge(String judgeCmd) {
         this.judgeCmd = judgeCmd;
-        this.srcFilename = srcFilename;
     }
 
     public Ruling rule(String src, TestCase tc) throws IOException, InterruptedException {
 
         log.info(tc.toString());
 
-        setupWorkdir(src, tc);
+        JudgeParams jp = new JudgeParams(tc, src);
 
-        String output = execJudge();
+        log.info(jp.toString());
+
+        String output = execJudge(jp);
 
         log.info("Ruling " + output.trim());
 
@@ -40,25 +38,18 @@ public class Judge {
         return buildRuling(json);
     }
 
-    private void setupWorkdir(String src, TestCase tc) throws IOException {
-        workdir.mkdir();
-
-        try(BufferedWriter writer = Files.newBufferedWriter(Paths.get(WORKDIR + srcFilename))) {
-            writer.write(src);
-        }
-        try(BufferedWriter writer = Files.newBufferedWriter(Paths.get(WORKDIR + "/in"))) {
-            writer.write(tc.getInput());
-        }
-        try(BufferedWriter writer = Files.newBufferedWriter(Paths.get(WORKDIR + "/out"))) {
-            writer.write(tc.getOutput());
-        }
-    }
-
-    private String execJudge() throws IOException, InterruptedException {
+    private String execJudge(JudgeParams jp) throws IOException, InterruptedException {
         String output = "";
         try {
-            Process p = new ProcessBuilder(judgeCmd).directory(workdir).start();
+            Process p = new ProcessBuilder(judgeCmd).start();
+
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+            writer.write(jp.toJsonString());
+            writer.flush();
+            writer.close();
+
             p.waitFor();
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             int ch;
             while((ch = reader.read()) != -1) {
@@ -71,6 +62,6 @@ public class Judge {
     }
 
     public Ruling buildRuling(JSONObject json) {
-        return new Ruling(json.getString("ruling"), json.getString("time"));
+        return new Ruling(json.getString("ruling"), json.getString("wallTime"));
     }
 }

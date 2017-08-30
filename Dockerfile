@@ -1,8 +1,5 @@
 FROM openjdk:8
 
-ADD target/*.jar /the-courtroom/
-ADD src/main/resources/*.properties /the-courtroom/
-
 ADD https://raw.githubusercontent.com/mrrusof/the-bench/master/ruby/script/ruby-judge.sh /the-courtroom/
 RUN chmod +x /the-courtroom/ruby-judge.sh
 ENV PATH=$PATH:/the-courtroom/
@@ -14,5 +11,8 @@ RUN mkdir -p /tmp/download && \
     rm -rf /tmp/download
 
 EXPOSE 8080
+
+ADD src/main/resources/*.properties /the-courtroom/
+ADD target/*.jar /the-courtroom/
 
 ENTRYPOINT java -jar /the-courtroom/*.jar
