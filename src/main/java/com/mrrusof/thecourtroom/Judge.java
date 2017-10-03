@@ -41,7 +41,7 @@ public class Judge {
     private String execJudge(JudgeParams jp) throws IOException, InterruptedException {
         String output = "";
         try {
-            Process p = new ProcessBuilder(judgeCmd).start();
+            Process p = new ProcessBuilder(judgeCmd.split(" ")).start();
 
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
             writer.write(jp.toJsonString());
