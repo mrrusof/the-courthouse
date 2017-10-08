@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class Judge {
 
+    private final Integer MAX_LOG_LEN = 1000;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private final String judgeCmd;
 
@@ -23,15 +24,15 @@ public class Judge {
 
     public Ruling rule(String src, TestCase tc) throws IOException, InterruptedException {
 
-        log.info(tc.toString());
+        log.info(truncate(tc.toString()));
 
         JudgeParams jp = new JudgeParams(tc, src);
 
-        log.info(jp.toString());
+        log.info(truncate(jp.toString()));
 
         String output = execJudge(jp);
 
-        log.info("Ruling " + output.trim());
+        log.info(truncate("Ruling " + output.trim()));
 
         JSONObject json = new JSONObject(output);
 
@@ -63,5 +64,12 @@ public class Judge {
 
     public Ruling buildRuling(JSONObject json) {
         return new Ruling(json.getString("ruling"), json.getString("wallTime"));
+    }
+
+    private String truncate(String s) {
+        if(s.length() > MAX_LOG_LEN) {
+            return s.substring(0, MAX_LOG_LEN - 1) + "... (truncated)";
+        }
+        return s;
     }
 }
