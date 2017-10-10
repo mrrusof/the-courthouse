@@ -2,5 +2,4 @@ language: java
 jdk: oraclejdk8
 
 script:
-  - docker login -u mrrusof -p $DOCKER_PWD
-  - make push
+  - ./mvnw verify && docker login -u mrrusof -p $DOCKER_PWD && make push
