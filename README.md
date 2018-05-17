@@ -3,5 +3,5 @@
 ## Requirements
 
 - Java 1.8
-- [The Bench](https://github.com/mrrusof/the-bench)
+- [The Witness Stand](https://github.com/mrrusof/the-witness-stand)
 - [The Law](https://github.com/mrrusof/the-law)

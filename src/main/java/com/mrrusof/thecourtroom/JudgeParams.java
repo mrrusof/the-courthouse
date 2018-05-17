@@ -2,19 +2,20 @@ package com.mrrusof.thecourtroom;
 
 import org.json.JSONObject;
 
-public class JudgeParams {
+public abstract class JudgeParams {
     private TestCase tc;
-    private String src;
+    private String program;
 
-    public JudgeParams(TestCase tc, String src) {
+    public JudgeParams(String program, TestCase tc) {
         this.tc = tc;
-        this.src = src;
+        this.program = program;
     }
 
+    public abstract String programKey();
+
     public String toJsonString() {
-        return "{ \"program\":" + JSONObject.quote(src) +
-            ", \"input\":" + JSONObject.quote(tc.getInput()) +
-            ", \"output\":" + JSONObject.quote(tc.getOutput()) + " }";
+        return "{ " + JSONObject.quote(programKey()) + ":" + JSONObject.quote(program) +
+            ", \"input\":" + JSONObject.quote(tc.getInput()) + " }";
     }
 
     public String toString() {

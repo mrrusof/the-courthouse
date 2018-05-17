@@ -27,6 +27,14 @@ public class Ruling {
         return centiseconds / 100 + "." + String.format("%02d", centiseconds % 100);
     }
 
+    public String toString() {
+        return "Ruling " + toJsonString();
+    }
+
+    private String toJsonString() {
+        return "{ \"ruling\":\"" + ruling + "\", \"seconds\":\"" + getSeconds() + "\" }";
+    }
+
     Long getCentiseconds() {
         return centiseconds;
     }
@@ -38,19 +46,11 @@ public class Ruling {
         String seconds;
         String centis = "0";
 
-        String[] partsTime = time.split(":");
+        String[] partsTime = time.split("m ");
         switch(partsTime.length) {
-        case 3:
-            hours = partsTime[0];
-            minutes = partsTime[1];
-            seconds = partsTime[2];
-            break;
         case 2:
             minutes = partsTime[0];
             seconds = partsTime[1];
-            break;
-        case 1:
-            seconds = time;
             break;
         default:
             throw new RuntimeException("Wrong format for time string: " + time);
@@ -61,6 +61,7 @@ public class Ruling {
         case 2:
             seconds = partsSeconds[0];
             centis = partsSeconds[1];
+            centis = centis.substring(0, centis.length() - 1); // remove trailing s
             break;
         case 1:
             break;

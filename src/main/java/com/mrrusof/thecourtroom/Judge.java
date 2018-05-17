@@ -11,41 +11,113 @@ import java.nio.file.Paths;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 
 public class Judge {
 
     private final Integer MAX_LOG_LEN = 1000;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private final String judgeCmd;
+    private final Environment env;
+    private final String lang;
+    private final String src;
+    private String program;
 
-    public Judge(String judgeCmd) {
-        this.judgeCmd = judgeCmd;
+    public Judge(String lang, String src, Environment env) throws Exception {
+        this.env = env;
+        this.lang = lang;
+
+        if(! env.containsProperty(envKey("name"))) {
+            throw new Exception("There is no Judge for language '" + lang + "'.");
+        }
+
+        this.src = src;
     }
 
-    public Ruling rule(String src, TestCase tc) throws IOException, InterruptedException {
+    private String envValue(String key) {
+        return env.getProperty(envKey(key));
+    }
 
+    private String envKey(String key) {
+        return "judge." + lang + "." + key;
+    }
+
+    public Ruling buildProgram() throws IOException, InterruptedException {
+        if(isCompiled()) {
+            String output = compile();
+            if(output.length() == 0) {
+                return new Ruling(Ruling.RUNTIME_ERROR, "0m 0.00s");
+            }
+            JSONObject json = new JSONObject(output);
+            int exitCode = json.getInt("exitCode");
+            String wallTime = json.getString("wallTime");
+            if(exitCode != 0) {
+                return new Ruling(Ruling.RUNTIME_ERROR, wallTime);
+            }
+            program = json.getString("binaryProgram");
+            return new Ruling(Ruling.ACCEPTED, wallTime);
+        } else {
+            program = src;
+            return new Ruling(Ruling.ACCEPTED, "0m 0.00s");
+        }
+    }
+
+    private boolean isCompiled() {
+        return envValue("compiled").equals("true");
+    }
+
+    private String compile() throws IOException, InterruptedException {
+        log.info("*** Compile ***");
+        log.info(truncate("compile input: " + compileInput().trim()));
+        String output = run(compileCommand(), compileInput());
+        log.info(truncate("sandbox output: " + output.trim()));
+        return output;
+    }
+
+    private String runCommand() {
+        String sandbox = envValue("sandbox");
+        return "the-witness-stand " + sandbox + " run-" + lang;
+    }
+
+    private String compileCommand() {
+        String compiler = envValue("compiler");
+        return "the-witness-stand " + compiler + " compile-" + lang;
+    }
+
+    private String compileInput() {
+        return "{ \"source\":" + JSONObject.quote(src) + " }";
+    }
+
+    public Ruling rule(TestCase tc) throws IOException, InterruptedException {
+        log.info("*** Rule ***");
         log.info(truncate(tc.toString()));
 
-        JudgeParams jp = new JudgeParams(tc, src);
+        JudgeParams jp;
+        if(isCompiled()) {
+            jp = new BinaryJudgeParams(program, tc);
+        } else {
+            jp = new InterpretedJudgeParams(program, tc);
+        }
 
         log.info(truncate(jp.toString()));
 
-        String output = execJudge(jp);
+        String output = run(runCommand(), jp.toJsonString());
 
-        log.info(truncate("Ruling " + output.trim()));
+        log.info(truncate("sandbox output: " + output.trim()));
 
-        JSONObject json = new JSONObject(output);
+        Ruling ruling = buildRuling(output, tc);
 
-        return buildRuling(json);
+        log.info(truncate(ruling.toString()));
+
+        return ruling;
     }
 
-    private String execJudge(JudgeParams jp) throws IOException, InterruptedException {
+    private String run(String cmd, String input) throws IOException, InterruptedException {
         String output = "";
         try {
-            Process p = new ProcessBuilder(judgeCmd.split(" ")).start();
+            Process p = new ProcessBuilder(cmd.split(" ")).start();
 
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
-            writer.write(jp.toJsonString());
+            writer.write(input);
             writer.flush();
             writer.close();
 
@@ -62,8 +134,25 @@ public class Judge {
         return output;
     }
 
-    public Ruling buildRuling(JSONObject json) {
-        return new Ruling(json.getString("ruling"), json.getString("wallTime"));
+    public Ruling buildRuling(String output, TestCase tc) {
+        if(output.length() == 0) {
+            return new Ruling(Ruling.TIMEOUT, "0m 10.00s");
+        }
+        JSONObject json = new JSONObject(output);
+        String actualOutput = json.getString("actualOutput");
+        int exitCode = json.getInt("exitCode");
+        String wallTime = json.getString("wallTime");
+        String ruling;
+        if(exitCode == 0) {
+            if(actualOutput.equals(tc.getOutput())) {
+                ruling = Ruling.ACCEPTED;
+            } else {
+                ruling = Ruling.WRONG_ANSWER;
+            }
+        } else {
+            ruling = Ruling.RUNTIME_ERROR;
+        }
+        return new Ruling(ruling, wallTime);
     }
 
     private String truncate(String s) {
