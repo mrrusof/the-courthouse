@@ -5,11 +5,13 @@ public class JudgeId {
     private final String id;
     private final String name;
     private final String codemirrormode;
+    private final String notes;
 
-    public JudgeId(String id, String name, String codemirrormode) {
+    public JudgeId(String id, String name, String codemirrormode, String notes) {
         this.id = id;
         this.name = name;
         this.codemirrormode = codemirrormode;
+        this.notes = notes;
     }
 
     public String getId() {
@@ -24,4 +26,7 @@ public class JudgeId {
         return codemirrormode;
     }
 
+    public String getNotes() {
+        return notes;
+    }
 }

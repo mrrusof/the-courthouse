@@ -32,7 +32,8 @@ public class CourtroomController {
         for(String id : judgeIds) {
             String name = env.getProperty("judge." + id + ".name");
             String codemirrormode = env.getProperty("judge." + id + ".codemirrormode");
-            judges.add(new JudgeId(id, name, codemirrormode));
+            String notes = env.getProperty("judge." + id + ".notes");
+            judges.add(new JudgeId(id, name, codemirrormode, notes));
         }
         return judges;
     }
@@ -44,7 +45,8 @@ public class CourtroomController {
             throw new Exception("There is no Judge for language '" + id + "'.");
         String name = env.getProperty("judge." + id + ".name");
         String codemirrormode = env.getProperty("judge." + id + ".codemirrormode");
-        return new JudgeId(id, name, codemirrormode);
+        String notes = env.getProperty("judge." + id + ".notes");
+        return new JudgeId(id, name, codemirrormode, notes);
     }
 
     @CrossOrigin(origins = "*")
