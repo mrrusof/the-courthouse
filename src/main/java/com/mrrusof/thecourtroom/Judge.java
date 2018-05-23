@@ -75,12 +75,12 @@ public class Judge {
 
     private String runCommand() {
         String sandbox = envValue("sandbox");
-        return "the-witness-stand " + sandbox + " run-" + lang;
+        return "the-witness-stand " + sandbox;
     }
 
     private String compileCommand() {
         String compiler = envValue("compiler");
-        return "the-witness-stand " + compiler + " compile-" + lang;
+        return "the-witness-stand " + compiler;
     }
 
     private String compileInput() {
@@ -112,6 +112,7 @@ public class Judge {
     }
 
     private String run(String cmd, String input) throws IOException, InterruptedException {
+        log.info("Run command: " + cmd);
         String output = "";
         try {
             Process p = new ProcessBuilder(cmd.split(" ")).start();
