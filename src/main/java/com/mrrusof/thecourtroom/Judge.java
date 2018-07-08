@@ -113,26 +113,44 @@ public class Judge {
 
     private String run(String cmd, String input) throws IOException, InterruptedException {
         log.info("Run command: " + cmd);
-        String output = "";
+        StringBuilder output = new StringBuilder(input.length());
         try {
             Process p = new ProcessBuilder(cmd.split(" ")).start();
 
+            log.info("Preparing");
+
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
             writer.write(input);
+            log.info("Wrote input");
             writer.flush();
+            log.info("Flushed input");
             writer.close();
-
-            p.waitFor();
+            log.info("Closed writer, reading output");
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             int ch;
+            int imAliveCountdown = 1000;
             while((ch = reader.read()) != -1) {
-                output += Character.toString((char) ch);
+                output.append((char) ch);
+                imAliveCountdown--;
+                if(imAliveCountdown == 0) {
+                    log.info("Still reading output");
+                    imAliveCountdown = 1000;
+                }
             }
+            reader.close();
+
+            log.info("Got output, waiting for process");
+
+            p.waitFor();
+
+            log.info("Done");
         } catch(IOException e) {
             throw e;
+        } catch(InterruptedException e) {
+            throw e;
         }
-        return output;
+        return output.toString();
     }
 
     public Ruling buildRuling(String output, TestCase tc) {
