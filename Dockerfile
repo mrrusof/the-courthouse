@@ -7,8 +7,8 @@ RUN mkdir -p /tmp/download && \
     rm -rf /tmp/download
 
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /the-courtroom/
-ADD https://github.com/mrrusof/the-witness-stand/releases/download/0.3.0-2018.05.22/the-witness-stand-0.3.0-2018.05.22.tar.gz /
-RUN tar -xzf /the-witness-stand-0.3.0-2018.05.22.tar.gz
+ADD https://github.com/mrrusof/the-witness-stand/releases/download/0.5.0-2018.07.09/the-witness-stand-0.5.0-2018.07.09.tar.gz /
+RUN tar -xzf /*.tar.gz
 RUN chmod +x /the-courtroom/*.sh
 ENV PATH=$PATH:/the-courtroom/:/tws/bin/
 
